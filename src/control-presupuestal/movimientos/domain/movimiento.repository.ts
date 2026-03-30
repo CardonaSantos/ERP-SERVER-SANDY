@@ -1,4 +1,8 @@
 import { MovimientoPresupuesto } from '../entities/movimiento.entity';
+import {
+  MovimientoFiltros,
+  PaginatedMovimientos,
+} from '../interfaces/interfaces';
 
 export const MOVIMIENTO_REPOSITORY = Symbol('MOVIMIENTO_REPOSITORY');
 
@@ -22,4 +26,6 @@ export interface MovimientoRepository {
   findCompromisoByRequisicion(
     requisicionId: number,
   ): Promise<MovimientoPresupuesto | null>;
+
+  findForTable(filtros: MovimientoFiltros): Promise<PaginatedMovimientos>;
 }

@@ -5,8 +5,11 @@ import {
   ParseIntPipe,
   HttpStatus,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import { MovimientosService } from '../app/movimientos.service';
+import { QueryMovimientosDto } from '../dto/query';
+import { PaginatedMovimientos } from '../interfaces/interfaces';
 
 @Controller('movimientos')
 export class MovimientosController {
@@ -25,5 +28,19 @@ export class MovimientosController {
     return await this.movimientosService.obtenerHistorialPorPresupuesto(
       presupuestoId,
     );
+  }
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  async findAll(
+    @Query() query: QueryMovimientosDto,
+  ): Promise<PaginatedMovimientos> {
+    return this.movimientosService.getTabla({
+      periodoId: query.periodoId,
+      centroCostoId: query.centroCostoId,
+      tipo: query.tipo,
+      page: query.page,
+      pageSize: query.pageSize,
+    });
   }
 }

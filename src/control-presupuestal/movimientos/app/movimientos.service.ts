@@ -3,7 +3,11 @@ import {
   MOVIMIENTO_REPOSITORY,
   MovimientoRepository,
 } from '../domain/movimiento.repository';
-import { TipoMovimientoPresupuesto } from '../interfaces/interfaces';
+import {
+  MovimientoFiltros,
+  PaginatedMovimientos,
+  TipoMovimientoPresupuesto,
+} from '../interfaces/interfaces';
 import { ErrorHandler } from 'src/utils/error_handler'; // Ajusta la ruta a tu manejador global
 import { MovimientoPresupuesto } from '../entities/movimiento.entity';
 
@@ -83,5 +87,9 @@ export class MovimientosService {
     } catch (error) {
       ErrorHandler.handle(error);
     }
+  }
+
+  async getTabla(filtros: MovimientoFiltros): Promise<PaginatedMovimientos> {
+    return this.repoMovimiento.findForTable(filtros);
   }
 }
