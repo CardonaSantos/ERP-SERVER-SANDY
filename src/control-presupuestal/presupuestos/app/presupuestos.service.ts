@@ -102,8 +102,9 @@ export class PresupuestosService {
     dto: UpdatePresupuestoDto,
   ): Promise<Presupuesto> {
     try {
-      const entity = await this.obtenerPorId(id);
+      this.logger.log('El dto llegando es: ', dto);
 
+      const entity = await this.obtenerPorId(id);
       // Calcular la diferencia para saber si es ampliación o recorte
       if (dto.montoAsignado !== undefined) {
         const diferencia = dto.montoAsignado - entity.getMontoAsignado();

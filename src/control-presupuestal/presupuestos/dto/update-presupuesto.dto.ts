@@ -8,4 +8,6 @@ export class UpdatePresupuestoDto {
   @Min(0, { message: 'El monto asignado no puede ser negativo.' })
   @IsOptional()
   montoAsignado?: number;
+
+  nombre?: string;
 }
