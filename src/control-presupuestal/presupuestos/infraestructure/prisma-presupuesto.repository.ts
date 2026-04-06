@@ -6,6 +6,7 @@ import { PresupuestoMapper } from '../common/mappers';
 import { PresupuestoDetalleView } from '../interfaces/interfaces-view';
 import { dateUtils } from 'src/utils/dateUtils';
 import { mapToDetalleView } from '../common/map';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class PrismaPresupuestoRepository implements PresupuestoRepository {
@@ -31,14 +32,19 @@ export class PrismaPresupuestoRepository implements PresupuestoRepository {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async save(presupuesto: Presupuesto): Promise<Presupuesto> {
+  async save(
+    presupuesto: Presupuesto,
+    tx?: Prisma.TransactionClient,
+  ): Promise<Presupuesto> {
     try {
+      const prism = tx ? tx : this.prisma;
+
       const data = PresupuestoMapper.toPersistence(presupuesto);
 
-      const record = await this.prisma.presupuesto.upsert({
+      const record = await prism.presupuesto.upsert({
         where: { id: presupuesto.getId() || 0 },
         create: data,
-        update: { ...data, id: undefined }, // Protegemos el ID para que no se actualice
+        update: { ...data, id: undefined },
       });
 
       return PresupuestoMapper.toDomain(record);
@@ -140,6 +146,7 @@ export class PrismaPresupuestoRepository implements PresupuestoRepository {
         select: {
           id: true,
           montoDisponible: true,
+          montoComprometido: true,
           partida: {
             select: {
               id: true,
@@ -160,6 +167,7 @@ export class PrismaPresupuestoRepository implements PresupuestoRepository {
         records.map((r) => ({
           id: r.id,
           montoDisponible: r.montoDisponible,
+          montoComprometido: r.montoComprometido,
           partida: r.partida.nombre,
           partidaId: r.partida.id,
           fechaFin: r.periodo.fechaFin,

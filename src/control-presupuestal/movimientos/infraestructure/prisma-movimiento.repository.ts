@@ -17,11 +17,13 @@ export class PrismaMovimientoRepository implements MovimientoRepository {
 
   async save(
     movimiento: MovimientoPresupuesto,
+    tx?: Prisma.TransactionClient,
   ): Promise<MovimientoPresupuesto> {
     try {
+      const transaction = tx ? tx : this.prisma;
       const data = MovimientoMapper.toPersistence(movimiento);
 
-      const record = await this.prisma.movimientoPresupuesto.create({
+      const record = await transaction.movimientoPresupuesto.create({
         data,
       });
 

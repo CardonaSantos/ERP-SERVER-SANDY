@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { MovimientoPresupuesto } from '../entities/movimiento.entity';
 import {
   MovimientoFiltros,
@@ -12,7 +13,10 @@ export interface MovimientoRepository {
    * Registra un nuevo movimiento en la base de datos (Append-Only).
    * @param movimiento La entidad de dominio inmutable
    */
-  save(movimiento: MovimientoPresupuesto): Promise<MovimientoPresupuesto>;
+  save(
+    movimiento: MovimientoPresupuesto,
+    tx?: Prisma.TransactionClient,
+  ): Promise<MovimientoPresupuesto>;
 
   /**
    * Obtiene todo el historial de movimientos de un presupuesto específico.

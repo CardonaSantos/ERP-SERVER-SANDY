@@ -10,6 +10,7 @@ import {
 } from '../interfaces/interfaces';
 import { ErrorHandler } from 'src/utils/error_handler'; // Ajusta la ruta a tu manejador global
 import { MovimientoPresupuesto } from '../entities/movimiento.entity';
+import { Prisma } from '@prisma/client';
 
 /**
  * Interfaz limpia para recibir los parámetros desde otros servicios.
@@ -39,6 +40,7 @@ export class MovimientosService {
 
   async registrar(
     params: RegistrarMovimientoParams,
+    tx?: Prisma.TransactionClient,
   ): Promise<MovimientoPresupuesto> {
     try {
       const entidad = new MovimientoPresupuesto(
@@ -53,7 +55,7 @@ export class MovimientosService {
         params.usuarioId || null,
       );
 
-      const guardado = await this.repoMovimiento.save(entidad);
+      const guardado = await this.repoMovimiento.save(entidad, tx);
 
       this.logger.log(
         `Movimiento registrado: [${guardado.getTipoMovimiento()}] por $${guardado.getMonto()} (Presupuesto ID: ${guardado.getPresupuestoId()})`,

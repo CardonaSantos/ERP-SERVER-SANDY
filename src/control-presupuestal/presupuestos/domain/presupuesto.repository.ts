@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { Presupuesto } from '../entities/presupuesto.entity';
 import {
   PresupuestoDetalleView,
@@ -10,7 +11,10 @@ export const PRESUPUESTO_REPOSITORY = Symbol('PRESUPUESTO_REPOSITORY');
 
 // 2. EL CONTRATO DEL DOMINIO
 export interface PresupuestoRepository {
-  save(presupuesto: Presupuesto): Promise<Presupuesto>;
+  save(
+    presupuesto: Presupuesto,
+    tx?: Prisma.TransactionClient,
+  ): Promise<Presupuesto>;
 
   findById(id: number): Promise<Presupuesto | null>;
 

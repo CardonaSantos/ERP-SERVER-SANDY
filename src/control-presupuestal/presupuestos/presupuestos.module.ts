@@ -16,5 +16,6 @@ import { MovimientosModule } from '../movimientos/movimientos.module';
       useClass: PrismaPresupuestoRepository,
     },
   ],
+  exports: [PresupuestosService],
 })
 export class PresupuestosModule {}

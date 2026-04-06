@@ -20,6 +20,7 @@ import {
 import { MovimientosService } from 'src/control-presupuestal/movimientos/app/movimientos.service';
 import { TipoMovimientoPresupuesto } from 'src/control-presupuestal/movimientos/interfaces/interfaces';
 import { LiberarSaldoDto } from '../dto/liberate-compromiso';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class PresupuestosService {
@@ -143,6 +144,7 @@ export class PresupuestosService {
     montoAComprometer: number,
     requisicionId: number,
     usuarioId: number,
+    tx?: Prisma.TransactionClient,
   ): Promise<Presupuesto> {
     try {
       const yaCobrado =
@@ -154,23 +156,26 @@ export class PresupuestosService {
         this.logger.warn(
           `La requisición ${requisicionId} ya había comprometido saldo. Ignorando.`,
         );
-        return await this.obtenerPorId(id); // Devolvemos sin hacer nada
+        return await this.obtenerPorId(id);
       }
 
       const entity = await this.obtenerPorId(id);
 
       entity.comprometer(montoAComprometer);
 
-      const savedEntity = await this.repoPresupuesto.save(entity);
+      const savedEntity = await this.repoPresupuesto.save(entity, tx);
 
-      await this.movimientosService.registrar({
-        presupuestoId: id,
-        tipoMovimiento: TipoMovimientoPresupuesto.COMPROMISO,
-        monto: montoAComprometer,
-        requisicionId: requisicionId,
-        usuarioId: usuarioId,
-        descripcion: `Compromiso por Requisición #${requisicionId}`,
-      });
+      await this.movimientosService.registrar(
+        {
+          presupuestoId: id,
+          tipoMovimiento: TipoMovimientoPresupuesto.COMPROMISO,
+          monto: montoAComprometer,
+          requisicionId: requisicionId,
+          usuarioId: usuarioId,
+          descripcion: `Compromiso por Requisición #${requisicionId}`,
+        },
+        tx,
+      );
 
       return savedEntity;
     } catch (error) {

@@ -189,8 +189,6 @@ export class RequisicionService {
         }
       : {};
 
-    this.logger.log('el where dinamico es: ', whereProducto);
-
     // ===== 2) Traer productos filtrados (ids) y total =====
     const [productos, total] = await this.prisma.$transaction([
       this.prisma.producto.findMany({
