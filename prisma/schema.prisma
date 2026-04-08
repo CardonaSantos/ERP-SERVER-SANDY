@@ -37,7 +37,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // url      = env("DATABASE_URL")
 }
 
 // ============================================================================
@@ -244,8 +244,11 @@ model Producto {
   descripcion              String?
   stock                    Stock[] // Relación con Stock
   categorias               Categoria[]                      @relation(name: "CategoriaToProducto")
-  ventas                   VentaProducto[] // Relación con productos vendidos en varias ventas
+  ventas                   VentaProducto[] // Relación con productos vendidos en varias ventas}
+
   codigoProducto           String                           @unique // NUEVO A APLICAR
+  // codigosQr CodigoQrProducto[]
+
   creadoEn                 DateTime                         @default(now())
   actualizadoEn            DateTime                         @updatedAt
   HistorialStock           HistorialStock[]
@@ -292,6 +295,26 @@ model Producto {
   partidaPresupuestalId Int?
   partidaPresupuestal   PartidaPresupuestal? @relation(fields: [partidaPresupuestalId], references: [id], onDelete: SetNull)
 }
+
+
+// model CodigoQrProducto {
+//   id            Int      @id @default(autoincrement())
+
+//   productoId    Int
+//   producto      Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
+
+//   codigo        String   @unique
+
+//   esPrincipal   Boolean  @default(false)
+//   activo        Boolean  @default(true)
+//   generadoPorSistema Boolean @default(true)
+
+//   creadoEn      DateTime @default(now())
+//   actualizadoEn DateTime @updatedAt
+
+//   @@index([productoId])
+// }
+
 
 model ProductoPresentacion {
   id           Int      @id @default(autoincrement())
