@@ -49,10 +49,7 @@ export class PrismaPresupuestoRepository implements PresupuestoRepository {
 
       return PresupuestoMapper.toDomain(record);
     } catch (error) {
-      this.logger.error(
-        `Error al guardar Presupuesto: ${error.message}`,
-        error.stack,
-      );
+      this.logger.error(`Error al guardar Presupuesto: ${error}`, error);
       throw error;
     }
   }
@@ -67,9 +64,7 @@ export class PrismaPresupuestoRepository implements PresupuestoRepository {
 
       return PresupuestoMapper.toDomain(record);
     } catch (error) {
-      this.logger.error(
-        `Error al buscar Presupuesto por ID ${id}: ${error.message}`,
-      );
+      this.logger.error(`Error al buscar Presupuesto por ID ${id}: ${error}`);
       throw error;
     }
   }
@@ -92,7 +87,7 @@ export class PrismaPresupuestoRepository implements PresupuestoRepository {
 
       return PresupuestoMapper.toDomain(record);
     } catch (error) {
-      this.logger.error(`Error en findByLlaveCompuesta: ${error.message}`);
+      this.logger.error(`Error en findByLlaveCompuesta: ${error}`);
       throw error;
     }
   }
@@ -102,7 +97,7 @@ export class PrismaPresupuestoRepository implements PresupuestoRepository {
       const records = await this.prisma.presupuesto.findMany();
       return PresupuestoMapper.toDomainList(records);
     } catch (error) {
-      this.logger.error(`Error al listar Presupuestos: ${error.message}`);
+      this.logger.error(`Error al listar Presupuestos: ${error}`);
       throw error;
     }
   }
@@ -113,9 +108,7 @@ export class PrismaPresupuestoRepository implements PresupuestoRepository {
         where: { id },
       });
     } catch (error) {
-      this.logger.error(
-        `Error al eliminar Presupuesto ${id}: ${error.message}`,
-      );
+      this.logger.error(`Error al eliminar Presupuesto ${id}: ${error}`);
       throw error;
     }
   }
@@ -175,9 +168,7 @@ export class PrismaPresupuestoRepository implements PresupuestoRepository {
         }));
       return recordsMapped;
     } catch (error) {
-      this.logger.error(
-        `Error al listar Presupuestos to Select: ${error.message}`,
-      );
+      this.logger.error(`Error al listar Presupuestos to Select: ${error}`);
       throw error;
     }
   }

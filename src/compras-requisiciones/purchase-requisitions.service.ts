@@ -10,12 +10,7 @@ import {
 import { CreatePurchaseRequisitionDto } from './dto/create-purchase-requisition.dto';
 import { UpdatePurchaseRequisitionDto } from './dto/update-purchase-requisition.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import * as dayjs from 'dayjs';
-import 'dayjs/locale/es';
-import * as utc from 'dayjs/plugin/utc';
-import * as timezone from 'dayjs/plugin/timezone';
-import * as isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
-import * as isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+
 import { TZGT } from 'src/utils/utils';
 import {
   CostoVentaTipo,
@@ -39,11 +34,20 @@ import { StockBaseDto, StockPresentacionDto } from './interfaces';
 import { MovimientoFinancieroService } from 'src/movimiento-financiero/movimiento-financiero.service';
 import { ProrrateoService } from 'src/prorrateo/prorrateo.service';
 import { PresupuestosService } from 'src/control-presupuestal/presupuestos/app/presupuestos.service';
+
+import dayjs = require('dayjs');
+import 'dayjs/locale/es'; // Este se queda igual
+import utc = require('dayjs/plugin/utc');
+import timezone = require('dayjs/plugin/timezone');
+import isSameOrAfter = require('dayjs/plugin/isSameOrAfter');
+import isSameOrBefore = require('dayjs/plugin/isSameOrBefore');
+import customParseFormat = require('dayjs/plugin/customParseFormat'); // Si lo usas en el gateway
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 dayjs.locale('es');
+
 const N = (x: any) => (Number.isFinite(Number(x)) ? Number(x) : 0);
 
 const MONEY_DECIMALS = 4; // totales
@@ -855,6 +859,12 @@ export class PurchaseRequisitionsService {
               },
             },
             proveedor: { select: { id: true } },
+            requisicion: {
+              select: {
+                id: true,
+                presupuestoId: true,
+              },
+            },
             pedido: {
               select: {
                 id: true,
@@ -1440,6 +1450,16 @@ export class PurchaseRequisitionsService {
           }
         }
 
+        if (compra.requisicion.presupuestoId) {
+          await this.presupuestoService.ejercerSaldo(
+            compra.requisicion.presupuestoId,
+            totalCompra,
+            compra.id,
+            dto.usuarioId,
+            tx,
+          );
+        }
+
         return {
           ok: true,
           compra: {
@@ -1735,6 +1755,21 @@ export class PurchaseRequisitionsService {
             userID,
             tx,
           );
+
+          if (!req.presupuestoId) {
+            await tx.requisicion.update({
+              where: { id: createPurchaseRequisitionDto.requisicionID },
+              data: {
+                presupuestoId: createPurchaseRequisitionDto.presupuestoId,
+              },
+            });
+          } else if (
+            req.presupuestoId !== createPurchaseRequisitionDto.requisicionID
+          ) {
+            throw new BadRequestException(
+              `La requisición ${createPurchaseRequisitionDto.requisicionID} ya está ligada a otro presupuesto (${req.presupuestoId})`,
+            );
+          }
         }
 
         // 9) Respuesta enriquecida

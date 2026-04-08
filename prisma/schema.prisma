@@ -1379,6 +1379,10 @@ model Requisicion {
   centroCosto   CentroCosto? @relation(fields: [centroCostoId], references: [id], onDelete: Restrict)
 
   movimientosPresupuesto MovimientoPresupuesto[]
+
+  presupuestoId Int?
+  presupuesto   Presupuesto? @relation(fields: [presupuestoId], references: [id], onDelete: Restrict)
+
 }
 
 model RequisicionLinea {
@@ -2540,6 +2544,7 @@ model Presupuesto {
 
   creadoEn            DateTime            @default(now())
   actualizadoEn       DateTime            @updatedAt
+  requisiciones Requisicion[]
 
   // Índice Único: Evita que se cree dos veces el mismo presupuesto para la misma área y mes
   @@unique([periodoId, centroCostoId, partidaId]) 

@@ -188,21 +188,36 @@ export class PresupuestosService {
     montoAEjercer: number,
     compraId: number,
     usuarioId: number,
+    tx?: Prisma.TransactionClient,
   ): Promise<Presupuesto> {
     try {
       const entity = await this.obtenerPorId(id);
+
+      // 1. Ejecutar lógica de negocio (esto ya valida)
       entity.ejercer(montoAEjercer);
 
-      const savedEntity = await this.repoPresupuesto.save(entity);
+      // 2. Guardar con tx
+      const savedEntity = await this.repoPresupuesto.save(entity, tx);
 
-      await this.movimientosService.registrar({
-        monto: montoAEjercer,
-        presupuestoId: id,
-        tipoMovimiento: TipoMovimientoPresupuesto.EJERCICIO,
-        compraId: compraId,
-        usuarioId: usuarioId,
-        descripcion: `Gasto ejercido por Compra #${compraId}`,
-      });
+      // 3. Registrar movimiento
+      await this.movimientosService.registrar(
+        {
+          monto: montoAEjercer,
+          presupuestoId: id,
+          tipoMovimiento: TipoMovimientoPresupuesto.EJERCICIO,
+          compraId,
+          usuarioId,
+          descripcion: `Gasto ejercido por Compra #${compraId}`,
+        },
+        tx,
+      );
+
+      if (savedEntity.montoDisponible === 0) {
+        await tx.partidaPresupuestal.update({
+          where: { id: savedEntity.getPartidaId() },
+          data: { estado: false },
+        });
+      }
 
       return savedEntity;
     } catch (error) {
