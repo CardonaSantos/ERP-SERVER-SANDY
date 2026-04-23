@@ -1353,7 +1353,7 @@ export class PurchaseRequisitionsService {
             descripcion: mfPayload.descripcion,
             sucursalId: mfPayload.sucursalId ?? sucursalId,
             costoVentaTipo: mfPayload.costoVentaTipo,
-            clasificacionAdmin: 'COSTO_VENTA',
+            // clasificacionAdmin: 'COSTO_VENTA',
             cuentaBancariaId: Number.isFinite(Number(cuentaBancariaIdMF))
               ? Number(cuentaBancariaIdMF)
               : undefined,

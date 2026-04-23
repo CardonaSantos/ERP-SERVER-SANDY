@@ -1257,24 +1257,41 @@ enum ClasificacionAdmin {
 
 // Motivo real del movimiento (habla el idioma del negocio)
 enum MotivoMovimiento {
+  // ===== EXISTENTES (NO TOCAR) =====
   VENTA
   OTRO_INGRESO
   GASTO_OPERATIVO
   COMPRA_MERCADERIA
-  COSTO_ASOCIADO // fletes, encomiendas, transporte a tienda
-  DEPOSITO_CIERRE // “para no dejar efectivo”
-  DEPOSITO_PROVEEDOR // depósito en ventanilla/boleta pagado con efectivo
-  PAGO_PROVEEDOR_BANCO // pago a proveedor desde banco (sin pasar por caja)
+  COSTO_ASOCIADO
+  DEPOSITO_CIERRE
+  DEPOSITO_PROVEEDOR
+  PAGO_PROVEEDOR_BANCO
   AJUSTE_SOBRANTE
   AJUSTE_FALTANTE
   DEVOLUCION
-  BANCO_A_CAJA //nuevo
-  COBRO_CREDITO //nuevo
+  BANCO_A_CAJA
+  COBRO_CREDITO
   PAGO_CREDITO
+
+  // ===== NUEVOS (EXTENSIÓN) =====
+  VENTA_CREDITO
+  COMPRA_INSUMOS
+  PAGO_PROVEEDOR_EFECTIVO
+  PAGO_NOMINA
+  PAGO_ALQUILER
+  PAGO_SERVICIOS
+  PAGO_IMPUESTOS
+  PAGO_COMISIONES
+  CAJA_A_BANCO
+  ANTICIPO_CLIENTE
+  ANTICIPO_PROVEEDOR
+  DEVOLUCION_PROVEEDOR
+  OTRO_EGRESO
 }
 
 // Subtipos útiles (se pueden volver tablas si el cliente quiere editar)
 enum GastoOperativoTipo {
+  // existentes
   SALARIO
   ENERGIA
   LOGISTICA
@@ -1283,6 +1300,17 @@ enum GastoOperativoTipo {
   PUBLICIDAD
   VIATICOS
   OTROS
+  // nuevos
+  COMBUSTIBLE
+  MANTENIMIENTO
+  REPUESTOS
+  LIMPIEZA
+  PAPELERIA
+  HERRAMIENTAS
+  SEGUROS
+  COMISIONES
+  IMPUESTOS
+  SERVICIOS_TECNICOS
 }
 
 enum CostoVentaTipo {
@@ -1291,6 +1319,11 @@ enum CostoVentaTipo {
   ENCOMIENDA
   TRANSPORTE
   OTROS
+
+  MATERIA_PRIMA
+  MATERIAL_CONSUMIBLE
+  SERVICIOS_TERCEROS
+  IMPORTACION
 }
 
 // ============================================================================
