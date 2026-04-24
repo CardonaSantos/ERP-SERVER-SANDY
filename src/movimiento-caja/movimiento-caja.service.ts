@@ -6,17 +6,17 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UtilidadesService } from 'src/caja/utilidades/utilidades.service';
 import { CajaService } from 'src/caja/caja.service';
+import { UtilitiesService } from 'src/utilities/utilities.service';
 
 @Injectable()
 export class MovimientoCajaService {
   private readonly logger = new Logger(MovimientoCajaService.name);
 
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly utilidades: UtilidadesService,
-    private readonly cajaService: CajaService,
+    private prisma: PrismaService,
+    private utilities: UtilitiesService, // ✔ corregido
+    private cajaService: CajaService,
   ) {}
   /**
    *

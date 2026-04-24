@@ -23,7 +23,13 @@ export interface AsientoContableResponse {
 
   lineas: AsientoContableLinea[];
 }
-
+export interface AsientoContablePaginatedResponse {
+  data: AsientoContableResponse[];
+  total: number;
+  page: number;
+  pageSize: number;
+  pageCount: number;
+}
 export interface AsientoContableLinea {
   id: number;
 
@@ -54,4 +60,12 @@ export interface AsientoContableLinea {
 
   creadoEn: string;
   actualizadoEn: string;
+}
+export interface GetAllAsientosParams {
+  page: number;
+  pageSize: number;
+  estado?: EstadoAsientoContable;
+  origen?: OrigenAsientoContable;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }

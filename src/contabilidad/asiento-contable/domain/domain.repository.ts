@@ -1,4 +1,8 @@
-import { AsientoContableResponse } from '../common/types-maps';
+import { EstadoAsientoContable, OrigenAsientoContable } from '@prisma/client';
+import {
+  AsientoContablePaginatedResponse,
+  AsientoContableResponse,
+} from '../common/types-maps';
 import { AsientoContable } from '../entities/asiento-contable.entity';
 
 export const ASIENTO_CONTABLE_REPOSITORY = Symbol(
@@ -11,7 +15,22 @@ export interface AsientoContableRepository {
   update(entity: AsientoContable, tx?: any): Promise<AsientoContable>;
 
   findById(id: number): Promise<AsientoContable | null>;
-  findAll(): Promise<Array<AsientoContableResponse>>;
+  // findAll(params: {
+  //   page: number;
+  //   pageSize: number;
+  //   estado?: EstadoAsientoContable;
+  //   origen?: OrigenAsientoContable;
+  //   sortBy: string;
+  //   sortOrder: 'asc' | 'desc';
+  // }): Promise<{
+  //   data: AsientoContableResponse[];
+  //   total: number;
+  //   page: number;
+  //   pageSize: number;
+  //   pageCount: number;
+  // }>;
+
+  findAll(params): Promise<AsientoContablePaginatedResponse>;
 
   delete(id: number, tx?: any): Promise<void>;
 }

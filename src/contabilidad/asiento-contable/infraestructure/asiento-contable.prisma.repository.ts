@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, PrismaClient } from '@prisma/client';
+import {
+  EstadoAsientoContable,
+  OrigenAsientoContable,
+  Prisma,
+  PrismaClient,
+} from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 import { AsientoContableRepository } from '../domain/domain.repository';
@@ -46,12 +51,45 @@ export class PrismaAsientoContableRepository
     return AsientoContableMapper.toDomain(record);
   }
 
-  async findAll(): Promise<AsientoContableResponse[]> {
+  // asiento-contable.service.ts
+  async findAll(params: {
+    page: number;
+    pageSize: number;
+    estado?: EstadoAsientoContable;
+    origen?: OrigenAsientoContable;
+    sortBy: string;
+    sortOrder: 'asc' | 'desc';
+  }): Promise<{
+    data: AsientoContableResponse[];
+    total: number;
+    page: number;
+    pageSize: number;
+    pageCount: number;
+  }> {
+    const { page, pageSize, estado, origen, sortBy, sortOrder } = params;
+
+    const where: Prisma.AsientoContableWhereInput = {};
+
+    if (estado) {
+      where.estado = estado;
+    }
+    if (origen) {
+      where.origen = origen;
+    }
+
+    const total = await this.prisma.asientoContable.count({ where });
+
     const records = await this.prisma.asientoContable.findMany({
+      where,
       include: { lineas: true },
+      orderBy: {
+        [sortBy]: sortOrder,
+      },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
     });
 
-    return records.map((r) => {
+    const data = records.map((r) => {
       const totalDebe = r.lineas.reduce(
         (acc, item) => acc + parseDecimal(item.debe),
         0,
@@ -67,54 +105,47 @@ export class PrismaAsientoContableRepository
         fecha: r.fecha.toISOString(),
         descripcion: r.descripcion,
         referencia: r.referencia,
-
         origen: r.origen,
         origenId: r.origenId,
-
         estado: r.estado,
-
         sucursalId: r.sucursalId,
         usuarioId: r.usuarioId,
-
         totalDebe,
         totalHaber,
-
         creadoEn: r.creadoEn.toISOString(),
         actualizadoEn: r.actualizadoEn.toISOString(),
-
         lineas: r.lineas.map((rl) => ({
           id: rl.id,
-
           asientoContableId: rl.asientoContableId,
           cuentaContableId: rl.cuentaContableId,
-
           debe: parseDecimal(rl.debe),
           haber: parseDecimal(rl.haber),
-
           descripcion: rl.descripcion,
-
           centroCostoId: rl.centroCostoId,
           partidaPresupuestalId: rl.partidaPresupuestalId,
-
           proveedorId: rl.proveedorId,
           clienteId: rl.clienteId,
           productoId: rl.productoId,
-
           ventaId: rl.ventaId,
           compraId: rl.compraId,
           movimientoFinancieroId: rl.movimientoFinancieroId,
-
           cxpDocumentoId: rl.cxpDocumentoId,
           cxpPagoId: rl.cxpPagoId,
           abonoCreditoId: rl.abonoCreditoId,
-
           historialStockId: rl.historialStockId,
-
           creadoEn: rl.creadoEn.toISOString(),
           actualizadoEn: rl.actualizadoEn.toISOString(),
         })),
       };
     });
+
+    return {
+      data,
+      total,
+      page,
+      pageSize,
+      pageCount: Math.ceil(total / pageSize),
+    };
   }
 
   async update(

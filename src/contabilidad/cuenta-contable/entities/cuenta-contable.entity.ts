@@ -82,17 +82,15 @@ export class CuentaContable {
   }
 
   public cambiarTipo(nuevoTipo: TipoCuentaContable): void {
-    if (this.tipo === nuevoTipo) {
-      throw new Error('El tipo ya está asignado');
+    if (this.tipo !== nuevoTipo) {
+      this.tipo = nuevoTipo;
     }
-    this.tipo = nuevoTipo;
   }
 
   public cambiarNaturaleza(nuevaNaturaleza: NaturalezaCuentaContable): void {
-    if (this.naturaleza === nuevaNaturaleza) {
-      throw new Error('La naturaleza ya está asignada');
+    if (this.naturaleza !== nuevaNaturaleza) {
+      this.naturaleza = nuevaNaturaleza;
     }
-    this.naturaleza = nuevaNaturaleza;
   }
 
   public activar(): void {
@@ -127,7 +125,7 @@ export class CuentaContable {
 
   public permitirMovimiento(): void {
     if (this.permiteMovimiento) {
-      throw new Error('La cuenta ya permite movimientos');
+      console.log('Ya se permite movimiento');
     }
     this.permiteMovimiento = true;
   }

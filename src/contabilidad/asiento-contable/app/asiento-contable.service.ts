@@ -8,6 +8,7 @@ import { AsientoContableLinea } from '../entities/asiento-contable-linea.entity'
 import { ErrorHandler } from 'src/utils/error_handler';
 import { CreateAsientoContableDto } from '../dto/dto';
 import { OrigenAsientoContable, Prisma } from '@prisma/client';
+import { GetAllAsientosParams } from '../common/types-maps';
 
 @Injectable()
 export class AsientoContableService {
@@ -208,7 +209,7 @@ export class AsientoContableService {
     }
   }
 
-  async getAll() {
-    return await this.repo.findAll();
+  async getAll(params: GetAllAsientosParams) {
+    return await this.repo.findAll(params); // Retorna página paginada
   }
 }

@@ -27,6 +27,7 @@ import {
   metodoPagoFromComprobante,
   toComprobanteNumero,
 } from './utils/helpers';
+import { ContabilizacionVentasService } from './contabilizacion.service';
 
 type Paginated<T> = {
   total: number;
@@ -42,6 +43,7 @@ export class CajaService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly utilities: UtilitiesService,
+    private readonly contabilizacionVentasService: ContabilizacionVentasService,
   ) {}
   private toNum(n: any): number {
     return n == null ? 0 : Number(n);
@@ -1323,33 +1325,42 @@ export class CajaService {
     //   });
     // }
 
-    if (!esCredito && venta.totalVenta > 0) {
-      const afectaCaja = esEfectivo && !!turno;
-      const deltaCaja = afectaCaja ? venta.totalVenta : 0;
-      const deltaBanco = !esEfectivo ? venta.totalVenta : 0;
+    // if (!esCredito && venta.totalVenta > 0) {
+    //   const afectaCaja = esEfectivo && !!turno;
+    //   const deltaCaja = afectaCaja ? venta.totalVenta : 0;
+    //   const deltaBanco = !esEfectivo ? venta.totalVenta : 0;
 
-      if (deltaCaja > 0 || deltaBanco > 0) {
-        await tx.movimientoFinanciero.create({
-          data: {
-            fecha: new Date(),
-            sucursalId,
-            registroCajaId: afectaCaja ? turno!.id : null,
-            clasificacion: 'INGRESO',
-            motivo: 'VENTA',
-            metodoPago: metodo,
-            deltaCaja,
-            deltaBanco,
-            descripcion: `Venta #${venta.id}`,
-            referencia: venta.referenciaPago ?? null,
-            usuarioId: usuarioId ?? venta.usuarioId,
-            esDepositoCierre: false,
-            esDepositoProveedor: false,
-            afectaInventario: false,
-          },
-        });
-      }
-    }
-
+    //   if (deltaCaja > 0 || deltaBanco > 0) {
+    //     await tx.movimientoFinanciero.create({
+    //       data: {
+    //         fecha: new Date(),
+    //         sucursalId,
+    //         registroCajaId: afectaCaja ? turno!.id : null,
+    //         clasificacion: 'INGRESO',
+    //         motivo: 'VENTA',
+    //         metodoPago: metodo,
+    //         deltaCaja,
+    //         deltaBanco,
+    //         descripcion: `Venta #${venta.id}`,
+    //         referencia: venta.referenciaPago ?? null,
+    //         usuarioId: usuarioId ?? venta.usuarioId,
+    //         esDepositoCierre: false,
+    //         esDepositoProveedor: false,
+    //         afectaInventario: false,
+    //       },
+    //     });
+    //   }
+    // }
+    await this.contabilizacionVentasService.registrarVentaTx(tx, {
+      ventaId: venta.id,
+      sucursalId,
+      usuarioId: usuarioId ?? venta.usuarioId,
+      totalVenta: Number(venta.totalVenta),
+      metodoPago: metodo as MetodoPago,
+      registroCajaId: shouldLinkCaja ? turno!.id : null,
+      referencia: venta.referenciaPago ?? null,
+      descripcion: `Venta #${venta.id}`,
+    });
     return { ventaId: venta.id, registroCajaId: turno?.id ?? null };
   }
 

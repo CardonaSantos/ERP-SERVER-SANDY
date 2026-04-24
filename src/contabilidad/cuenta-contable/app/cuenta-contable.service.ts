@@ -98,35 +98,39 @@ export class CuentaContableService {
     const entity = await this.obtenerPorId(id);
 
     try {
-      if (data.nombre) {
+      if (data.nombre !== undefined && data.nombre !== entity.getNombre()) {
         entity.rename(data.nombre);
       }
 
-      if (data.tipo) {
+      if (data.tipo !== undefined && data.tipo !== entity.getTipo()) {
         entity.cambiarTipo(data.tipo);
       }
 
-      if (data.naturaleza) {
+      if (
+        data.naturaleza !== undefined &&
+        data.naturaleza !== entity.getNaturaleza()
+      ) {
         entity.cambiarNaturaleza(data.naturaleza);
       }
 
-      if (data.permiteMovimiento === true) {
-        entity.permitirMovimiento();
+      if (
+        data.permiteMovimiento !== undefined &&
+        data.permiteMovimiento !== entity.permiteMovimientos()
+      ) {
+        if (data.permiteMovimiento) entity.permitirMovimiento();
+        else entity.bloquearMovimiento();
       }
 
-      if (data.permiteMovimiento === false) {
-        entity.bloquearMovimiento();
+      if (data.activa !== undefined && data.activa !== entity.estaActiva()) {
+        if (data.activa) entity.activar();
+        else entity.desactivar();
       }
-
-      if (data.activa === true) entity.activar();
-      if (data.activa === false) entity.desactivar();
 
       if (data.padreId !== undefined) {
         if (data.padreId === null) {
           entity.quitarPadre();
         } else {
           const padre = await this.repo.findById(data.padreId);
-
           if (!padre) {
             throw new NotFoundException('Cuenta padre no encontrada');
           }
@@ -134,7 +138,9 @@ export class CuentaContableService {
           this.validarNoCiclo(entity.getId(), data.padreId);
           this.validarCompatibilidadPadre(entity, padre);
 
-          entity.asignarPadre(data.padreId);
+          if (data.padreId !== entity.getPadreId()) {
+            entity.asignarPadre(data.padreId);
+          }
         }
       }
 
