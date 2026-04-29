@@ -1118,9 +1118,22 @@ model RegistroCaja {
   actualizadoEn DateTime       @updatedAt
   abonosCredito AbonoCredito[] @relation("Caja_AbonosCredito") // <— backref
 
+  // NUEVOS CAMPOS
+  efectivoContado   Decimal? @db.Decimal(14, 2)
+  diferenciaCaja    Decimal? @db.Decimal(14, 2)
+  estadoCuadre      EstadoCuadreCaja?
+  comentarioCuadre  String?
+
   // @@index([sucursalId, estado])
   @@index([sucursalId, estado, fechaCierre])
   @@index([sucursalId, usuarioInicioId, estado, fechaCierre]) // ✅ nuevo
+}
+
+
+enum EstadoCuadreCaja {
+  CUADRA
+  SOBRANTE
+  FALTANTE
 }
 
 enum EstadoTurnoCaja {
